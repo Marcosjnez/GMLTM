@@ -117,14 +117,14 @@ GMLTM <- function(data, Q, components, iters = 2000, chains = 2,
                     indexes_alpha = indexes_alpha, n_alpha = nrow(indexes_alpha),
                     Q = Q, C = C, y = y, cf = 1)
 
-  GMLTM_model <- cmdstanr::cmdstan_model("R/models/GMLTM.stan", compile = TRUE,
+  GMLTM_model <- cmdstanr::cmdstan_model("inst/GMLTM.stan", compile = TRUE,
                                          cpp_options = list(stan_threads = TRUE))
 
   fit <- GMLTM_model$sample(data = data_list, chains = chains,
                               iter_sampling = iters, iter_warmup = iter_warmup,
                               parallel_chains = chains, validate_csv = FALSE,
                               threads_per_chain = 1, seed = seed,
-                              output_dir = "posteriors/", output_basename = "GMLTM")
+                              output_dir = "inst/", output_basename = "GMLTM")
 
   theta <- fit$draws("theta", format = "draws_matrix")
   alpha <- fit$draws("alpha", format = "draws_matrix")
