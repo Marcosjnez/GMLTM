@@ -140,7 +140,7 @@ GMLTM <- function(data, Q, components, iters = 2000, chains = 2,
   #             col.names = vector_names, nrows = iters)
   # x <- do.call(rbind, args = list(x1, x2))
 
-  result <- list(theta, alpha, eta, beta, guessing)
+  result <- list(theta = theta, alpha = alpha, eta = eta, beta = beta, guessing = guessing)
   return(result)
 
 }
