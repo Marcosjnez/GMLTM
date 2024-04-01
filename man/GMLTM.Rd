@@ -19,7 +19,15 @@ GMLTM(data, Q, components, iters = 2000, iter_warmup = 1000, chains = 2, seed = 
 
 \item{iter_warmup}{Number of samples to discard then initializing a Markov chain.}
 
+\item{interval}{Probability associated with the credible intervals.}
+
 \item{seed}{Random seed.}
+
+\item{parallel_chains}{Number of chains to run in parallel cores.}
+
+\item{threads_per_chain}{Number of cores to run within a chain.}
+
+\item{...}{Additional arguments to pass to the \code{sample} function from \code{cmdstanr}.}
 }
 \value{
 \code{cmdstan} object:

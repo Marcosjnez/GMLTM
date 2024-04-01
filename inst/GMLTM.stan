@@ -21,17 +21,19 @@ transformed data {
   matrix[N, M] Cx = C[item, ];
 }
 parameters {
-  // cholesky_factor_corr[M] U;
-  // matrix[N_subj, M] Z;
   matrix[N_subj, M] theta;
   vector[n_eta] eta;
   vector<lower=0>[max_n_alpha] alpha;
   vector<lower=0, upper=1>[N_item] c;
 }
 transformed parameters {
+}
+model {
   matrix[K, M] eta_matrix;
   matrix[N_item, M] alpha_matrix;
-  matrix[N_item, M] beta;
+  matrix[N_item, M] beta_matrix;
+  matrix[N, M] mu;
+  vector[N] p;
 
   eta_matrix = rep_matrix(0, K, M);
   alpha_matrix = rep_matrix(0, N_item, M);
@@ -41,29 +43,13 @@ transformed parameters {
   for(i in 1:n_alpha) {
     alpha_matrix[indexes_alpha[i, 1], indexes_alpha[i, 2]] = alpha[indexes_alpha[i, 3]];
   }
-
-  beta = Q * eta_matrix;
-
-}
-model {
-
-  // matrix[N_subj, M] theta;
-  // matrix[M, M] rho;
-  vector[N] p;
-  matrix[N, M] mu;
-  // theta = Z * U';
-  // rho = U * U';
-  // target += lkj_corr_cholesky_lpdf(U | cf);
-  mu = inv_logit(alpha_matrix[item, ] .* (theta[ID, ] - beta[item, ])) .^ Cx;
-
+  beta_matrix = Q * eta_matrix;
+  mu = inv_logit(alpha_matrix[item, ] .* (theta[ID, ] - beta_matrix[item, ])) .^ Cx;
   for(i in 1:N) {
     p[i] = c[item[i]] + (1-c[item[i]]) .* prod(mu[i, ]);
   }
-
-  // target += normal_lpdf(to_vector(Z) | 0, 1);
   target += normal_lpdf(to_vector(theta) | 0, 1);
   target += normal_lpdf(eta | 0, 1);
-  // target += lognormal_lpdf(alpha | 0, 1);
   target += normal_lpdf(alpha | 0, 1) -
             normal_lccdf(0 | 0, 1);
   target += beta_lpdf(c | 3, 20);
