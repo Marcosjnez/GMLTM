@@ -1,4 +1,3 @@
-
 data {
   int N_subj; // Número de sujetos
   int N_item; // Número de ítems
@@ -16,10 +15,10 @@ parameters {
   vector[K] eta;
 }
 transformed parameters {
-  vector[N_item] beta;
-  beta = Q * eta;
 }
 model {
+  vector[N_item] beta;
+  beta = Q * eta;
   vector[N] p;
   p = inv_logit(theta[ID] - beta[item]);
   target += normal_lpdf(theta | 0, 1);
@@ -27,9 +26,9 @@ model {
   target += bernoulli_lpmf(y | p);
 }
 generated quantities {
-  // vector[N] log_lik;
+  // vector[N] loglik;
   // for(i in 1:N) {
-  //     log_lik[i] = bernoulli_lpmf(y[i] | p[i]);
+  //     loglik[i] = bernoulli_lpmf(y[i] | p[i]);
   // }
 }
 

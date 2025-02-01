@@ -1,5 +1,6 @@
 #' @title
 #' Posterior predictive checks, fitted values, and prediction intervals.
+#'
 #' @description
 #'
 #' Plot the frequency distribution of the empirical and simulated total scores and obtain the fitted values and prediction intervals.
@@ -19,7 +20,7 @@
 #'
 #' @references
 #'
-#' Ramirez E., Jiménez M., Franco V., Alvarado J. (2024). Delving into... preprint.
+#' Ramírez, E.S.; Jiménez, M.; Franco, V.R.; Alvarado, J.M. Delving into the Complexity of Analogical Reasoning: A Detailed Exploration with the Generalized Multicomponent Latent Trait Model for Diagnosis. \emph{J. Intell.} 2024, 12, 67. https://doi.org/10.3390/jintelligence12070067
 #'
 #' @export
 ppchecks <- function(fit, nsim = 100, interval = 0.95, ...) {
@@ -57,10 +58,11 @@ ppchecks <- function(fit, nsim = 100, interval = 0.95, ...) {
   result <- list(items = fitted_items, subjects = fitted_subjects,
                  fitted = EAP_p, ysim = ysim)
 
-  # cols2 <- c(rgb(1, 0, 0, 1/2), rgb(0, 0, 1, 1/2), rgb(0.36, 0, 0.64, 0.5))
-  # legend(17, 0.10, legend = c("Predicted", "Observed", "Overlap"),
-  #        col = c(cols2[1], cols2[2], cols2[3]), lwd = 2, cex = 1,
-  #        title = "\n Posterior \n Predictive Check", text.width = 3.75) # title = "Group" box.lty = 0
+  cols2 <- c(rgb(1, 0, 0, 1/4), rgb(0, 0, 1, 1/4), rgb(0.36, 0, 0.64, 0.5))
+  legend("topright", legend = c("Predicted", "Observed", "Overlap"),
+         col = c(cols2[1], cols2[2], cols2[3]), lwd = 4, cex = 1,
+         title = "\n Posterior \n Predictive Check", text.width = 3.75, box.lty = 0, title.font = 2) # title = "Group" box.lty = 0
+
 
   return(invisible(result))
 

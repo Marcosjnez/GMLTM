@@ -46,9 +46,9 @@ model {
   target += bernoulli_lpmf(y | p);
 }
 generated quantities {
-  // vector[N] log_lik;
+  // vector[N] loglik;
   // for(i in 1:N) {
-  //   log_lik[i] = bernoulli_lpmf(y[i] | p[i]);
+  //   loglik[i] = bernoulli_lpmf(y[i] | p[i]);
   // }
 }
 

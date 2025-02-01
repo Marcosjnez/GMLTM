@@ -16,7 +16,7 @@
 #'
 #' @references
 #'
-#' Ramirez E., Jiménez M., Franco V., Alvarado J. (2024). Delving into... preprint.
+#' Ramírez, E.S.; Jiménez, M.; Franco, V.R.; Alvarado, J.M. Delving into the Complexity of Analogical Reasoning: A Detailed Exploration with the Generalized Multicomponent Latent Trait Model for Diagnosis. \emph{J. Intell.} 2024, 12, 67. https://doi.org/10.3390/jintelligence12070067
 #'
 #' @export
 reliability <- function(fit) {

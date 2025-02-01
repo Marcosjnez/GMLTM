@@ -8,9 +8,9 @@
 #'
 #' LLTM(data, Q, components, iters = 2000, iter_warmup = 1000, chains = 2, quantiles = c(0.025, 0.50,  0.975))
 #'
-#' @param data $$n \times p$$ data.frame or data matrix with the individuals in rows and items in columns.
-#' @param Q $$p \times q$$ Q matrix.
-#' @param components List of $$d$$ elements relating each components to a vector of rules.
+#' @param data \eqn{n \times p} data.frame or data matrix with the individuals in rows and items in columns.
+#' @param Q \eqn{p \times q} Q matrix.
+#' @param components List of \eqn{d} elements relating each components to a vector of rules.
 #' @param iters Number of samples from the posterior distribution.
 #' @param iter_warmup Number of samples to discard then initializing a Markov chain.
 #' @param chains Number of Markov chains.
@@ -19,19 +19,72 @@
 #' @param threads_per_chain Number of cores to run within a chain.
 #' @param ... Additional arguments to pass to the \code{sample} function from \code{cmdstanr}.
 #'
-#' @details \code{LLTM} estimates a ...
+#' @details \code{LLTM} Estimates the Bayesian version of the linear logistic model LLTM (Fisher, 1973), a model that extends the unidimensional Rasch model and is suitable for the analysis of items comprising tasks solved by the examinee through the combination of a certain number of cognitive operations or rules.
 #'
 #' @return \code{cmdstan} object:
 #'
 #' @references
 #'
-#' Ramirez E., Jiménez M., Franco V., Alvarado J. (2024). Delving into... preprint.
+#' Fischer, G. H. (1973). The linear logistic test model as an instrument in educational research. \emph{Acta psychologica}, 37(6), 359-374.\cr
+#'
+#' Lozano, J. H., & Revuelta, J. (2021). Bayesian estimation and testing of a linear logistic test model for learning during the test. Applied Measurement in Education, 34(3), 223-235.\cr
+#'
+#' Ramírez, E.S.; Jiménez, M.; Franco, V.R.; Alvarado, J.M. Delving into the Complexity of Analogical Reasoning: A Detailed Exploration with the Generalized Multicomponent Latent Trait Model for Diagnosis. \emph{J. Intell.} 2024, 12, 67. https://doi.org/10.3390/jintelligence12070067
+#'
+#'@examples
+#' \dontrun{
+#' # Load the data
+#' data(analogy)
+#' # These data correspond to the study:
+#' # Blum, D., Holling, H., Galibert, M. S., & Forthmann, B. (2016). Task difficulty prediction of figural analogies. Intelligence, 56, 72-81.
+#' # Define the dataset
+#'
+#' dataset <- analogy
+#'
+#' # Define the Q matrix with item rules
+#' Q <- structure(c(0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1,
+#'                  1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+#'                  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0,
+#'                  0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1,
+#'                  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+#'                  0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1,
+#'                  1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1), dim = c(27L, 5L), dimnames = list(
+#'                   c("item 1", "item 2", "item 3", "item 4", "item 5", "item 6",
+#'                     "item 7", "item 8", "item 9", "item 10", "item 11", "item 12",
+#'                     "item 13", "item 14", "item 15", "item 16", "item 17", "item 18",
+#'                     "item 19", "item 20", "item 21", "item 22", "item 23", "item 24",
+#'                     "item 25", "item 26", "item 27"), c("rot_fig", "rot_trap",
+#'                                                         "reflection", "subt_seg", "mov_point"))) #The labels correspond to the names of the rules.
+#'
+#'
+#' # Define the fit3 object
+#' fit3 <- LLTM(dataset, Q, iters = 2000, iter_warmup = 500,
+#'              quantiles = c(0.05, 0.5, 0.95), chains = 2, parallel_chains = 2)
+#'
+#' # Print the difficulty parameter for each rule.
+#' fit2$EAP$eta
+#'
+#' # Print the difficulty parameter for each item. For items with rules from both components, print both difficulties.
+#' fit3$EAP$beta
+#'
+#' # Provides a summary of parameter estimates and diagnoses convergence in a Bayesian model for the eta parameter.
+#' fit3$fit$print("eta")
+#'
+#' # Provides a summary of parameter estimates and diagnoses convergence in a Bayesian model for the beta parameter.
+#' fit3$fit$print("beta")
+#'
+#' # Marginal reliability for each component
+#' reliability(fit3)
+#'
+#' # Print all ppchecks of the model
+#' check3 <- ppchecks(fit3)
+#' }
 #'
 #' @export
 LLTM <- function(data, Q, components, iters = 2000, chains = 2,
-                  iter_warmup = 1000, quantiles = c(0.025, 0.975),
-                  parallel_chains = 1, threads_per_chain = 1,
-                  ...) {
+                 iter_warmup = 1000, quantiles = c(0.025, 0.975),
+                 parallel_chains = 1, threads_per_chain = 1,
+                 ...) {
 
   K <- ncol(Q) # Number of rules + interactions
   y <- unname(unlist(dataset)) # Vector of data
@@ -103,6 +156,7 @@ LLTM <- function(data, Q, components, iters = 2000, chains = 2,
   colnames(quantiles_beta) <- as.character(quantiles)
 
   # probabilities and loglik:
+  iters <- iters*chains
   y <- unname(unlist(data)) # Vector of data
   p <- loglik <- array(NA, dim = c(iters, N_subj, N_item))
   for(i in 1:iters) {
